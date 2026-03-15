@@ -1,0 +1,38 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="mb-4">Ventas Realizadas</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID Venta</th>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Cliente</th>
+                <th>Productos</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>{{ venta.id_venta }}</td>
+                <td>{{ venta.fecha }}</td>
+                <td>{{ venta.user.name }}</td>
+                <td>{{ venta.cliente.nombre }}</td>
+                <td>
+                    <ul>
+                        {% for detalle in venta.detalles %}
+                        <li>{{ detalle.producto.nombre_producto }} x{{ detalle.cantidad }} - Bs. {{ detalle.subtotal }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>Bs. {{ venta.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

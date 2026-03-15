@@ -1,0 +1,266 @@
+{% extends 'admin/base.html' %}
+
+{% block head %}
+{{ super() }}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+html,body{
+height:100%;
+margin:0;
+overflow:hidden;
+font-family:'Poppins', sans-serif;
+background:#f4f6f9;
+}
+
+/* ocultar navbar original */
+.navbar{
+display:none;
+}
+
+/* layout */
+.layout{
+display:flex;
+height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:240px;
+background:#111827;
+color:white;
+display:flex;
+flex-direction:column;
+padding:20px;
+}
+
+.logo{
+font-size:20px;
+font-weight:600;
+margin-bottom:30px;
+}
+
+/* usuario */
+
+.user-info{
+background:#1f2937;
+padding:12px;
+border-radius:8px;
+margin-bottom:25px;
+}
+
+.user-role{
+font-size:12px;
+opacity:0.7;
+}
+
+.badge{
+background:#2563eb;
+padding:3px 8px;
+border-radius:5px;
+font-size:11px;
+}
+
+/* menu */
+
+.menu a{
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px;
+margin-bottom:6px;
+border-radius:6px;
+color:#d1d5db;
+text-decoration:none;
+font-size:14px;
+transition:0.2s;
+}
+
+.menu a:hover{
+background:#2563eb;
+color:white;
+}
+
+/* CONTENIDO DERECHO */
+
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+height:100vh;
+}
+
+/* TOPBAR */
+
+.topbar{
+height:60px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 25px;
+border-bottom:1px solid #e5e7eb;
+flex-shrink:0;
+}
+
+.top-title{
+font-weight:600;
+font-size:16px;
+}
+
+.logout{
+text-decoration:none;
+color:#ef4444;
+font-size:14px;
+}
+
+/* CONTENIDO */
+
+.content{
+flex:1;
+overflow-y:auto;
+padding:25px;
+}
+
+.content .container{
+max-width:100%;
+}
+
+/* DASHBOARD CARDS */
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.08);
+}
+
+.card h3{
+font-size:14px;
+color:#6b7280;
+margin-bottom:10px;
+}
+
+.card p{
+font-size:26px;
+font-weight:600;
+}
+
+</style>
+
+{% endblock %}
+
+
+
+{% block page_body %}
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div class="logo">
+📚 Papelería Prisma
+</div>
+
+<div class="user-info">
+<div><b>{{ current_user.name }}</b></div>
+
+<div class="user-role">
+Rol:
+<span class="badge">{{ current_user.role }}</span>
+</div>
+</div>
+
+<div class="menu">
+
+<a href="/admin/">🏠 Dashboard</a>
+
+{% if current_user.role == "admin" %}
+
+<a href="/admin/user/">👤 Usuarios</a>
+<a href="/admin/proveedor/">🚚 Proveedores</a>
+
+{% endif %}
+
+{% if current_user.role in ["admin","vendedor","cajero"] %}
+<a href="/admin/cliente/">👥 Clientes</a>
+
+<a href="/admin/categoria/">📂 Categorías</a>
+<a href="/admin/producto/">📦 Productos</a>
+<a href="/admin/chatbot_ai/">🤖 Chatbot IA</a>
+<a href="/admin/vender/">💰 Ventas</a>
+<a href="/admin/ventas_realizadas/">📄 Ventas Realizadas</a>  
+
+{% endif %}
+
+</div>
+
+</div>
+
+
+<!-- AREA DERECHA -->
+<div class="main">
+
+<div class="topbar">
+
+<div class="top-title">
+
+</div>
+
+<a class="logout" href="/logout">Cerrar sesión</a>
+
+</div>
+
+<div class="content">
+
+{% if request.path == "/admin/" %}
+
+<h2 style="margin-bottom:20px;">Dashboard</h2>
+
+<div class="cards">
+
+<div class="card">
+<h3>Ventas Hoy</h3>
+<p>{{ ventas_hoy }}</p>
+</div>
+
+<div class="card">
+<h3>Total Ventas</h3>
+<p>{{ total_ventas }}</p>
+</div>
+
+<div class="card">
+<h3>Productos</h3>
+<p>{{ total_productos }}</p>
+</div>
+
+<div class="card">
+<h3>Clientes</h3>
+<p>{{ total_clientes }}</p>
+</div>
+
+</div>
+
+{% else %}
+
+{{ super() }}
+
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

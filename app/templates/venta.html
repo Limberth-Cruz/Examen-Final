@@ -1,0 +1,159 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="mb-4">Registrar Venta</h2>
+
+    
+
+    <form method="POST" id="ventaForm">
+        <div class="row mb-3">
+
+<!-- Usuario logueado (mostrar nombre en la misma línea) -->
+    <div class="col-md-6">
+        <label class="form-label">Usuario:</label>
+        <span class="fw-bold">{{ current_user.name }}</span>
+    </div>
+
+    <!-- Selección de cliente -->
+    <div class="col-md-6">
+        <label for="cliente" class="form-label">Cliente:</label>
+        <select name="cliente" id="cliente" class="form-select" required>
+            {% for c in clientes %}
+                <option value="{{ c.id_cliente }}">{{ c.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+        <!-- ----------------filtrar-------------> 
+<div class="mb-3">
+    <label for="buscarProducto" class="form-label">Buscar producto:</label>
+    <input type="text" id="buscarProducto" class="form-control" placeholder="Nombre del producto">
+</div>
+
+<h4>Productos disponibles</h4>
+<table class="table table-striped table-bordered" id="productosTable">
+    <thead>
+        <tr>
+            <th>Agregar</th>
+            <th>Producto</th>
+            <th>Stock</th>
+            <th>Precio unitario</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in productos %}
+        <tr>
+            <td>
+                <input type="checkbox" class="producto-checkbox" 
+                       name="producto" 
+                       value="{{ p.id_producto }}" 
+                       data-id="{{ p.id_producto }}" 
+                       data-nombre="{{ p.nombre_producto }}" 
+                       data-precio="{{ p.precio_venta }}" 
+                       data-stock="{{ p.stock }}">
+            </td>
+            <td class="nombre-producto">{{ p.nombre_producto }}</td>
+            <td>{{ p.stock }}</td>
+            <td>Bs. {{ p.precio_venta }}</td>
+            <td>
+                <input type="number" class="cantidad-input form-control" 
+                       name="cantidad_{{ p.id_producto }}" 
+                       data-id="{{ p.id_producto }}" 
+                       value="1" min="1" max="{{ p.stock }}">
+            </td>
+            <td class="subtotal" data-id="{{ p.id_producto }}">0</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+// Filtrar productos por nombre
+document.getElementById('buscarProducto').addEventListener('input', function() {
+    let filtro = this.value.toLowerCase();
+    document.querySelectorAll('#productosTable tbody tr').forEach(tr => {
+        let nombre = tr.querySelector('.nombre-producto').innerText.toLowerCase();
+        tr.style.display = nombre.includes(filtro) ? '' : 'none';
+    });
+});
+</script>
+<!-- ----------------fin filtrar-------------> 
+
+        <h4>Carrito</h4>
+        <table class="table table-bordered" id="carritoTable">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas generadas dinámicamente con JS -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3">Total</th>
+                    <th id="total">0</th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <button type="submit" class="btn btn-success">Registrar Venta</button>
+    </form>
+</div>
+
+<script>
+const checkboxes = document.querySelectorAll('.producto-checkbox');
+const cantidades = document.querySelectorAll('.cantidad-input');
+const carritoBody = document.querySelector('#carritoTable tbody');
+const totalEl = document.getElementById('total');
+
+function actualizarCarrito() {
+    carritoBody.innerHTML = '';
+    let total = 0;
+
+    checkboxes.forEach(cb => {
+        const id = cb.dataset.id;
+        const cantidadInput = document.querySelector(`.cantidad-input[data-id="${id}"]`);
+        let cantidad = parseInt(cantidadInput.value);
+
+        if(cb.checked && cantidad > 0){
+            const nombre = cb.dataset.nombre;
+            const precio = parseFloat(cb.dataset.precio);
+            const stock = parseInt(cb.dataset.stock);
+
+            if(cantidad > stock) cantidad = stock;
+            cantidadInput.value = cantidad;
+
+            const subtotal = precio * cantidad;
+            total += subtotal;
+
+            document.querySelector(`.subtotal[data-id="${id}"]`).innerText = subtotal.toFixed(2);
+
+            carritoBody.innerHTML += `
+                <tr>
+                    <td>${nombre}</td>
+                    <td>${cantidad}</td>
+                    <td>${precio.toFixed(2)}</td>
+                    <td>${subtotal.toFixed(2)}</td>
+                </tr>
+            `;
+        } else {
+            document.querySelector(`.subtotal[data-id="${id}"]`).innerText = '0';
+        }
+    });
+
+    totalEl.innerText = total.toFixed(2);
+}
+
+checkboxes.forEach(cb => cb.addEventListener('change', actualizarCarrito));
+cantidades.forEach(c => c.addEventListener('input', actualizarCarrito));
+</script>
+
+{% endblock %}
