@@ -48,5 +48,24 @@ def logout():
     logout_user()
 
     return redirect(url_for("auth.login"))
+    
+# -------------------------
+# API chatbot (usada por admin/chatbot.html)
+# -------------------------
+@auth_bp.route("/chatbot", methods=["POST"])
+@login_required
+def chatbot():
+
+    data = request.json
+
+    pregunta = data.get("mensaje")
+
+    respuesta = preguntar_chatbot(pregunta)
+
+    return jsonify({
+        "respuesta": respuesta
+    })
+
+
 
 
