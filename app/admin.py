@@ -130,6 +130,11 @@ class VentasRealizadasView(BaseView):
 
         return self.render('admin/ventas_realizadas.html', ventas=ventas)
     
+class ChatbotView(BaseView):
+
+    @expose('/')
+    def index(self):
+        return self.render('admin/chatbot.html')
 
 
 # =========================
