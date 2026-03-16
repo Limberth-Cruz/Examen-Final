@@ -48,7 +48,9 @@ def logout():
     logout_user()
 
     return redirect(url_for("auth.login"))
-    
+
+
+
 # -------------------------
 # API chatbot (usada por admin/chatbot.html)
 # -------------------------
