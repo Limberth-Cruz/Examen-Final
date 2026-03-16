@@ -130,7 +130,84 @@ class VentasRealizadasView(BaseView):
 
         return self.render('admin/ventas_realizadas.html', ventas=ventas)
     
+class ChatbotView(BaseView):
 
+    @expose('/')
+    def index(self):
+        return self.render('admin/chatbot.html')
+    
+
+
+class AnalisisIAView(BaseView):
+
+    @expose('/')
+    def index(self):
+
+        productos = Producto.query.all()
+        clientes = Cliente.query.all()
+        ventas = Venta.query.all()
+        categorias = Categoria.query.all()
+
+        # =========================
+        # LISTAS
+        # =========================
+        lista_productos = ""
+        for p in productos:
+            lista_productos += f"{p.nombre_producto} stock:{p.stock} precio:{p.precio_venta}\n"
+
+        lista_clientes = ""
+        for c in clientes:
+            lista_clientes += f"{c.nombre}\n"
+
+        lista_categorias = ""
+        for c in categorias:
+            lista_categorias += f"{c.nombre_categoria}\n"
+
+        lista_ventas = ""
+        for v in ventas:
+            lista_ventas += f"venta {v.id_venta} total:{v.total}\n"
+
+        # =========================
+        # PROMPT IA
+        # =========================
+        prompt = f"""
+Eres un analista de datos.
+
+PRODUCTOS:
+{lista_productos}
+
+CLIENTES:
+{lista_clientes}
+
+CATEGORÍAS:
+{lista_categorias}
+
+VENTAS:
+{lista_ventas}
+
+
+
+Genera un reporte corto con:
+1. Total de productos
+2. Productos con poco stock
+3. Observaciones de ventas
+4. Recomendaciones
+5. Conclusión
+"""
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        analisis = response.choices[0].message.content
+
+        return self.render(
+            'admin/analisis_ia.html',
+            analisis=analisis
+        )
 
 # =========================
 # Registrar todas las vistas en admin
@@ -151,5 +228,9 @@ def configuracion_admin():
     admin_panel.add_view(VenderView(name='Vender', endpoint='vender'))
 
     admin_panel.add_view(VentasRealizadasView(name='Ventas Realizadas', endpoint='ventas_realizadas'))
+
+
+    admin_panel.add_view(ChatbotView(name='Chatbot IA', endpoint='chatbot_ai'))
+    admin_panel.add_view(AnalisisIAView(name='Análisis IA', endpoint='analisis_ai'))
 
 
