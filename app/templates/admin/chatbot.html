@@ -1,0 +1,52 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+
+<h2>Chatbot IA</h2>
+
+<div id="chat" style="height:300px;overflow:auto;border:1px solid #ccc;padding:10px"></div>
+
+<input id="mensaje" class="form-control mt-2">
+
+<button onclick="enviar()" class="btn btn-primary mt-2">Enviar</button>
+
+<script>
+
+function enviar(){
+
+let mensaje = document.getElementById("mensaje").value
+
+fetch("/chatbot",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({mensaje:mensaje})
+})
+.then(res=>res.json())
+.then(data=>{
+
+let chat = document.getElementById("chat")
+
+chat.innerHTML += "<p><b>Tú:</b> "+mensaje+"</p>"
+chat.innerHTML += "<p><b>Bot:</b><br>"+data.respuesta.replace(/\n/g,"<br>")+"</p>"
+
+document.getElementById("mensaje").value=""
+document.getElementById("mensaje").focus()
+
+})
+
+}
+
+document.getElementById("mensaje").addEventListener("keypress", function(e){
+
+if(e.key === "Enter"){
+
+e.preventDefault()
+enviar()
+
+}
+
+})
+
+</script>
+
+{% endblock %}
