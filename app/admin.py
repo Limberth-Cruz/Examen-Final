@@ -135,6 +135,7 @@ class ChatbotView(BaseView):
     @expose('/')
     def index(self):
         return self.render('admin/chatbot.html')
+    
 
 
 class AnalisisIAView(BaseView):
@@ -227,5 +228,9 @@ def configuracion_admin():
     admin_panel.add_view(VenderView(name='Vender', endpoint='vender'))
 
     admin_panel.add_view(VentasRealizadasView(name='Ventas Realizadas', endpoint='ventas_realizadas'))
+
+
+    admin_panel.add_view(ChatbotView(name='Chatbot IA', endpoint='chatbot_ai'))
+    admin_panel.add_view(AnalisisIAView(name='Análisis IA', endpoint='analisis_ai'))
 
 
