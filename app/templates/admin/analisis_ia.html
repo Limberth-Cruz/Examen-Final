@@ -13,24 +13,3 @@ analisis_ia.html
 {% endblock %}
 
 
-from models import Producto, Venta, db
-
-def generar_resumen():
-
-    total_productos = Producto.query.count()
-
-    ventas = db.session.query(
-        Venta.producto_id,
-        db.func.sum(Venta.cantidad).label("total")
-    ).group_by(Venta.producto_id).order_by(db.desc("total")).first()
-
-    if ventas:
-        producto = Producto.query.get(ventas.producto_id)
-        resumen = f"El producto más vendido es {producto.nombre} con {ventas.total} ventas."
-    else:
-        resumen = "No hay ventas registradas."
-
-    return f"""
-    En el sistema hay {total_productos} productos registrados.
-    {resumen}
-    """
