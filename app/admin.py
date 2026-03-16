@@ -150,6 +150,5 @@ def configuracion_admin():
     # Vista personalizada de ventas también visible para estos roles
     admin_panel.add_view(VenderView(name='Vender', endpoint='vender'))
 
+
     admin_panel.add_view(VentasRealizadasView(name='Ventas Realizadas', endpoint='ventas_realizadas'))
-
-
